@@ -7,15 +7,42 @@ export default function App() {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [showControls, setShowControls] = useState(true)
   const [iframeKey, setIframeKey] = useState(0)
+  const [isDebugMode, setIsDebugMode] = useState(() => {
+    try {
+      return localStorage.getItem('DEBUG_MODE') === 'true'
+    } catch {
+      return false
+    }
+  })
   const iframeRef = useRef(null)
 
   useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement)
+    const checkDebug = () => {
+      try {
+        setIsDebugMode(localStorage.getItem('DEBUG_MODE') === 'true')
+      } catch {
+        setIsDebugMode(false)
+      }
+    }
+
+    window.addEventListener('storage', checkDebug)
+    // Poll occasionally or listen for devtools changes
+    const interval = setInterval(checkDebug, 1000)
+
+    window.setDebugMode = (enable = true) => {
+      try {
+        localStorage.setItem('DEBUG_MODE', enable ? 'true' : 'false')
+        checkDebug()
+      } catch (err) {
+        console.error(err)
+      }
     }
 
     document.addEventListener('fullscreenchange', handleFullscreenChange)
     return () => {
+      delete window.setDebugMode
+      window.removeEventListener('storage', checkDebug)
+      clearInterval(interval)
       document.removeEventListener('fullscreenchange', handleFullscreenChange)
     }
   }, [])
@@ -82,84 +109,86 @@ export default function App() {
         sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-downloads"
       />
 
-      {/* Floating Control Bar */}
-      {showControls ? (
-        <aside className="floating-dock" aria-label="Pip Tutor Controls">
-          <span
-            className={`status-indicator ${isLoading ? 'loading' : ''}`}
-            title={isLoading ? 'Loading...' : 'Connected'}
-          />
-          <span className="status-label">Pip Tutor</span>
+      {/* Floating Control Bar (Only visible when localStorage.DEBUG_MODE === 'true') */}
+      {isDebugMode && (
+        showControls ? (
+          <aside className="floating-dock" aria-label="Pip Tutor Controls">
+            <span
+              className={`status-indicator ${isLoading ? 'loading' : ''}`}
+              title={isLoading ? 'Loading...' : 'Connected'}
+            />
+            <span className="status-label">Pip Tutor</span>
 
+            <button
+              type="button"
+              className="action-btn"
+              onClick={handleReload}
+              title="Reload Frame"
+              aria-label="Reload Frame"
+            >
+              <RotateCw size={14} />
+            </button>
+
+            <button
+              type="button"
+              className="action-btn"
+              onClick={toggleFullscreen}
+              title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+              aria-label="Toggle Fullscreen"
+            >
+              {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+            </button>
+
+            <button
+              type="button"
+              className="action-btn"
+              onClick={handleOpenExternal}
+              title="Open in new tab"
+              aria-label="Open in new tab"
+            >
+              <ExternalLink size={14} />
+            </button>
+
+            <button
+              type="button"
+              className="action-btn"
+              onClick={() => setShowControls(false)}
+              title="Hide Toolbar"
+              aria-label="Hide Toolbar"
+            >
+              <EyeOff size={14} />
+            </button>
+          </aside>
+        ) : (
           <button
             type="button"
-            className="action-btn"
-            onClick={handleReload}
-            title="Reload Frame"
-            aria-label="Reload Frame"
+            onClick={() => setShowControls(true)}
+            title="Show Controls"
+            aria-label="Show Controls"
+            style={{
+              position: 'fixed',
+              bottom: 12,
+              right: 12,
+              width: 24,
+              height: 24,
+              borderRadius: '50%',
+              background: 'rgba(15, 23, 42, 0.4)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              color: '#94a3b8',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              zIndex: 9999,
+              opacity: 0.2,
+              transition: 'opacity 0.2s',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.2')}
           >
-            <RotateCw size={14} />
+            <Sparkles size={12} />
           </button>
-
-          <button
-            type="button"
-            className="action-btn"
-            onClick={toggleFullscreen}
-            title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
-            aria-label="Toggle Fullscreen"
-          >
-            {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
-          </button>
-
-          <button
-            type="button"
-            className="action-btn"
-            onClick={handleOpenExternal}
-            title="Open in new tab"
-            aria-label="Open in new tab"
-          >
-            <ExternalLink size={14} />
-          </button>
-
-          <button
-            type="button"
-            className="action-btn"
-            onClick={() => setShowControls(false)}
-            title="Hide Toolbar"
-            aria-label="Hide Toolbar"
-          >
-            <EyeOff size={14} />
-          </button>
-        </aside>
-      ) : (
-        <button
-          type="button"
-          onClick={() => setShowControls(true)}
-          title="Show Controls"
-          aria-label="Show Controls"
-          style={{
-            position: 'fixed',
-            bottom: 12,
-            right: 12,
-            width: 24,
-            height: 24,
-            borderRadius: '50%',
-            background: 'rgba(15, 23, 42, 0.4)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            color: '#94a3b8',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            zIndex: 9999,
-            opacity: 0.2,
-            transition: 'opacity 0.2s',
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
-          onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.2')}
-        >
-          <Sparkles size={12} />
-        </button>
+        )
       )}
     </main>
   )
