@@ -4,11 +4,16 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="theme-color" content="#0a0d14" />
-    <meta name="description" content="Pip Tutor — Interactive AI Studio & Intelligent Learning Environment. Learn coding, system design, and AI workflows edge-to-edge." />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="description" content="Pip Tutor — Interactive AI Studio & Intelligent Learning Environment. Make Your Child the Smartest Kid in the Room." />
     <meta name="keywords" content="Pip Tutor, AI Tutor, AI Studio, Interactive Learning, Coding Tutor, Prompt Engineering, Machine Learning, Fullscreen AI" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://piptutor.vercel.app/" />
+
+    <!-- Instant Pre-Cache & Network Pre-Connect Hints (0ms Network Start) -->
+    <link rel="preconnect" href="https://piptutor.ai.studio" crossorigin />
+    <link rel="dns-prefetch" href="https://piptutor.ai.studio" />
+    <link rel="preload" href="https://piptutor.ai.studio/" as="document" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
@@ -42,8 +47,117 @@
     </script>
 
     <title>Pip Tutor | AI Learning Studio</title>
+
+    <!-- Inline Critical Layout & Loader CSS for 0ms First-Paint -->
+    <style>
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html, body {
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: #ffffff;
+        color: #0f172a;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      #root {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 150;
+      }
+      .webview-frame {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+        outline: none;
+        display: block;
+        background-color: #ffffff;
+        z-index: 10;
+      }
+      .wait-screen {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: #ffffff;
+        z-index: 100;
+        pointer-events: none;
+        transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+        padding: 24px;
+      }
+      .wait-screen.hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+      .hero-wait-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        max-width: 960px;
+        width: 100%;
+        animation: heroFadeIn 0.3s ease-out forwards;
+      }
+      .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background-color: #d1fae5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+        border-radius: 9999px;
+        padding: 6px 18px;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        margin-bottom: 28px;
+        box-shadow: 0 1px 3px rgba(6, 95, 70, 0.05);
+      }
+      .hero-badge-icon {
+        color: #059669;
+        flex-shrink: 0;
+      }
+      .hero-title {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: clamp(36px, 5.8vw, 68px);
+        font-weight: 800;
+        letter-spacing: -0.035em;
+        line-height: 1.14;
+        margin: 0;
+      }
+      .hero-title-black {
+        color: #111827;
+      }
+      .hero-title-green {
+        color: #00b074;
+      }
+      @keyframes heroFadeIn {
+        from {
+          opacity: 0.8;
+          transform: translateY(4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
   </head>
-  <body>
+  <body style="background-color: #ffffff; margin: 0; padding: 0;">
     <noscript>
       <header>
         <h1>Pip Tutor — AI Learning Studio</h1>
@@ -53,6 +167,50 @@
         <p>Direct Link: <a href="https://piptutor.ai.studio/">https://piptutor.ai.studio/</a></p>
       </main>
     </noscript>
+
+    <!-- Immediate Embedded Webview: Parser starts network request at 0ms -->
+    <iframe
+      id="piptutor-frame"
+      class="webview-frame"
+      src="https://piptutor.ai.studio/"
+      allow="accelerometer; autoplay; camera; clipboard-read; clipboard-write; encrypted-media; fullscreen; geolocation; gyroscope; microphone; midi; payment; picture-in-picture; web-share; display-capture"
+      sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-downloads"
+    ></iframe>
+
+    <!-- Light Shade Wait Screen (Rendered on 1st HTML Paint at 0ms) -->
+    <div id="wait-screen" class="wait-screen">
+      <div class="hero-wait-content">
+        <div class="hero-badge">
+          <svg class="hero-badge-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+          <span>100% Safe &amp; Child-Friendly • Built For Curious Young Minds</span>
+        </div>
+        <h1 class="hero-title">
+          <span class="hero-title-black">Make Your Child the</span>
+          <span class="hero-title-green">Smartest Kid in the Room.</span>
+        </h1>
+      </div>
+    </div>
+
+    <!-- Pre-cached instant dismissal script (Runs without waiting for React) -->
+    <script>
+      (function() {
+        var frame = document.getElementById('piptutor-frame');
+        var wait = document.getElementById('wait-screen');
+        if (frame && wait) {
+          frame.addEventListener('load', function() {
+            wait.classList.add('hidden');
+          });
+          // Fallback timer so wait screen gracefully fades if iframe blocks load event
+          setTimeout(function() {
+            wait.classList.add('hidden');
+          }, 800);
+        }
+      })();
+    </script>
+
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
