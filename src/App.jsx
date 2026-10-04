@@ -3,7 +3,6 @@ import { RotateCw, ExternalLink, EyeOff, Sparkles, AlertCircle } from 'lucide-re
 
 export default function App() {
   const targetUrl = import.meta.env.VITE_APP_URL || 'https://piptutor.ai.studio/'
-  const [isLoading, setIsLoading] = useState(true)
   const [showControls, setShowControls] = useState(true)
   const [iframeKey, setIframeKey] = useState(0)
   const [isDebugMode, setIsDebugMode] = useState(() => {
@@ -43,16 +42,7 @@ export default function App() {
     }
   }, [])
 
-  // Hide loader as early as possible for immediate screen exposure and zero blocking
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 120)
-    return () => clearTimeout(timer)
-  }, [iframeKey])
-
   const handleReload = () => {
-    setIsLoading(true)
     setIframeKey((prev) => prev + 1)
   }
 
@@ -84,14 +74,7 @@ export default function App() {
       {/* Semantic SEO Heading */}
       <h1 className="visually-hidden">Pip Tutor — Interactive AI Studio & Intelligent Tutoring</h1>
 
-      {/* Instant Dismiss Loading Overlay */}
-      <div className={`loading-overlay ${!isLoading ? 'hidden' : ''}`} aria-hidden={!isLoading}>
-        <div className="spinner" />
-        <div className="loading-text">Loading Pip Tutor...</div>
-        <div className="loading-url">{targetUrl}</div>
-      </div>
-
-      {/* Edge-to-Edge Embedded Webview */}
+      {/* Edge-to-Edge Embedded Webview (Pure immediate render, zero loader) */}
       <iframe
         key={iframeKey}
         ref={iframeRef}
@@ -99,7 +82,6 @@ export default function App() {
         title="Pip Tutor AI Studio"
         src={targetUrl}
         className="webview-frame"
-        onLoad={() => setIsLoading(false)}
         allow="accelerometer; autoplay; camera; clipboard-read; clipboard-write; encrypted-media; fullscreen; geolocation; gyroscope; microphone; midi; payment; picture-in-picture; web-share; display-capture"
         sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-downloads"
       />
@@ -109,8 +91,8 @@ export default function App() {
         showControls ? (
           <aside className="floating-dock" aria-label="Pip Tutor Controls">
             <span
-              className={`status-indicator ${isLoading ? 'loading' : ''}`}
-              title={isLoading ? 'Loading...' : 'Connected'}
+              className="status-indicator"
+              title="Connected"
             />
             <span className="status-label">Pip Tutor</span>
 
