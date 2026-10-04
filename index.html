@@ -90,14 +90,22 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        background-color: #ffffff;
+        background-color: rgba(255, 255, 255, 0.65);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
         z-index: 100;
         pointer-events: none;
-        transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
         padding: 24px;
+        opacity: 1;
+        transform: scale(1);
+        transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                    visibility 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        will-change: opacity, transform, visibility;
       }
       .wait-screen.hidden {
         opacity: 0;
+        transform: scale(1.02) translateY(-10px);
         visibility: hidden;
         pointer-events: none;
       }
@@ -108,6 +116,7 @@
         text-align: center;
         max-width: 960px;
         width: 100%;
+        filter: drop-shadow(0 2px 20px rgba(255, 255, 255, 0.95));
         animation: heroFadeIn 0.3s ease-out forwards;
       }
       .hero-badge {
@@ -173,11 +182,12 @@
       id="piptutor-frame"
       class="webview-frame"
       src="https://piptutor.ai.studio/"
+      onload="window.__onIframeLoaded && window.__onIframeLoaded()"
       allow="accelerometer; autoplay; camera; clipboard-read; clipboard-write; encrypted-media; fullscreen; geolocation; gyroscope; microphone; midi; payment; picture-in-picture; web-share; display-capture"
       sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-downloads"
     ></iframe>
 
-    <!-- Light Shade Wait Screen (Rendered on 1st HTML Paint at 0ms) -->
+    <!-- Transparent Frosted Wait Screen on top of Iframe -->
     <div id="wait-screen" class="wait-screen">
       <div class="hero-wait-content">
         <div class="hero-badge">
@@ -194,19 +204,23 @@
       </div>
     </div>
 
-    <!-- Pre-cached instant dismissal script (Runs without waiting for React) -->
+    <!-- Auto-hide ONLY once iframe callback fires — no premature white screen -->
     <script>
       (function() {
+        window.__onIframeLoaded = function() {
+          var wait = document.getElementById('wait-screen');
+          if (wait && !wait.classList.contains('hidden')) {
+            requestAnimationFrame(function() {
+              setTimeout(function() {
+                wait.classList.add('hidden');
+              }, 120);
+            });
+          }
+        };
+
         var frame = document.getElementById('piptutor-frame');
-        var wait = document.getElementById('wait-screen');
-        if (frame && wait) {
-          frame.addEventListener('load', function() {
-            wait.classList.add('hidden');
-          });
-          // Fallback timer so wait screen gracefully fades if iframe blocks load event
-          setTimeout(function() {
-            wait.classList.add('hidden');
-          }, 800);
+        if (frame) {
+          frame.addEventListener('load', window.__onIframeLoaded);
         }
       })();
     </script>
