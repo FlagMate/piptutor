@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { RotateCw, ExternalLink, Maximize2, Minimize2, EyeOff, Sparkles, AlertCircle } from 'lucide-react'
+import { RotateCw, ExternalLink, EyeOff, Sparkles, AlertCircle } from 'lucide-react'
 
 export default function App() {
   const targetUrl = import.meta.env.VITE_APP_URL || 'https://piptutor.ai.studio/'
   const [isLoading, setIsLoading] = useState(true)
-  const [isFullscreen, setIsFullscreen] = useState(false)
   const [showControls, setShowControls] = useState(true)
   const [iframeKey, setIframeKey] = useState(0)
   const [isDebugMode, setIsDebugMode] = useState(() => {
@@ -26,7 +25,6 @@ export default function App() {
     }
 
     window.addEventListener('storage', checkDebug)
-    // Poll occasionally or listen for devtools changes
     const interval = setInterval(checkDebug, 1000)
 
     window.setDebugMode = (enable = true) => {
@@ -38,30 +36,16 @@ export default function App() {
       }
     }
 
-    document.addEventListener('fullscreenchange', handleFullscreenChange)
     return () => {
       delete window.setDebugMode
       window.removeEventListener('storage', checkDebug)
       clearInterval(interval)
-      document.removeEventListener('fullscreenchange', handleFullscreenChange)
     }
   }, [])
 
   const handleReload = () => {
     setIsLoading(true)
     setIframeKey((prev) => prev + 1)
-  }
-
-  const toggleFullscreen = async () => {
-    try {
-      if (!document.fullscreenElement) {
-        await document.documentElement.requestFullscreen()
-      } else {
-        await document.exitFullscreen()
-      }
-    } catch (err) {
-      console.error('Fullscreen toggle failed:', err)
-    }
   }
 
   const handleOpenExternal = () => {
@@ -109,7 +93,7 @@ export default function App() {
         sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-downloads"
       />
 
-      {/* Floating Control Bar (Only visible when localStorage.DEBUG_MODE === 'true') */}
+      {/* Floating Control Bar (Only active when localStorage.DEBUG_MODE === 'true') */}
       {isDebugMode && (
         showControls ? (
           <aside className="floating-dock" aria-label="Pip Tutor Controls">
@@ -127,16 +111,6 @@ export default function App() {
               aria-label="Reload Frame"
             >
               <RotateCw size={14} />
-            </button>
-
-            <button
-              type="button"
-              className="action-btn"
-              onClick={toggleFullscreen}
-              title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
-              aria-label="Toggle Fullscreen"
-            >
-              {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
             </button>
 
             <button
