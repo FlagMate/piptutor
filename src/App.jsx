@@ -43,6 +43,14 @@ export default function App() {
     }
   }, [])
 
+  // Hide loader as early as possible for immediate screen exposure and zero blocking
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 120)
+    return () => clearTimeout(timer)
+  }, [iframeKey])
+
   const handleReload = () => {
     setIsLoading(true)
     setIframeKey((prev) => prev + 1)
@@ -73,8 +81,11 @@ export default function App() {
 
   return (
     <main className="app-container">
-      {/* Loading Overlay */}
-      <div className={`loading-overlay ${!isLoading ? 'hidden' : ''}`}>
+      {/* Semantic SEO Heading */}
+      <h1 className="visually-hidden">Pip Tutor — Interactive AI Studio & Intelligent Tutoring</h1>
+
+      {/* Instant Dismiss Loading Overlay */}
+      <div className={`loading-overlay ${!isLoading ? 'hidden' : ''}`} aria-hidden={!isLoading}>
         <div className="spinner" />
         <div className="loading-text">Loading Pip Tutor...</div>
         <div className="loading-url">{targetUrl}</div>
